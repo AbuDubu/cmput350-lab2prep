@@ -72,19 +72,20 @@ struct TubePair {
 bool isTubeOffScreen(const TubePair& tube) { return tube.isOffScreen(); }
 
 struct BirdState {
-    BirdState() : velocityY{INITIAL_BIRD_VELOCITY_Y} {
+    BirdState() : velocityY{INITIAL_BIRD_VELOCITY_Y}, body(BIRD_RADIUS) {
         // ====== ====== ======
-        // TODO: (Q1)
         //  - initialize the bird's shape (see below) to have
         //    appropriate size, color, and initial position.
         //  Note: consider using member initializer list to set the radius via ctor call.
         // ====== ====== ======
+        body.setPosition(INITIAL_BIRD_POSITION);
+        body.setFillColor(INITIAL_BIRD_COLOUR);
     }
 
     // ====== ====== ======
-    // TODO: (Q1)
     //  - add a field for the bird's shape.
     // ====== ====== ======
+    sf::CircleShape body;
     float velocityY;
 };
 
@@ -206,6 +207,7 @@ void render(sf::RenderWindow& window, const GameState& gameState) {
     // ====== ====== ======
     // TODO: (Q1) Draw bird
     // ====== ====== ======
+    window.draw(gameState.bird.body);
     window.display();
 }
 
