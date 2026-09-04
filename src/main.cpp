@@ -129,6 +129,7 @@ private:
         //    Should be equivalent to: bird.positionY += bird.velocityY;
         //  - Note: bird's x-coordinate will alway be exactly 100.f
         // ====== ====== ======
+        bird.body.setPosition({100.f, bird.body.getPosition().y + bird.velocityY });
 
         // ====== ====== ======
         // TODO: (Q3)
@@ -136,6 +137,10 @@ private:
         //    (i.e., if it's no longer visible). If not, game should reset by clearing
         //    the tubes and restarting the game (setting the bird back to original initial position)
         // ====== ====== ======
+        if (bird.body.getPosition().y >= WINDOW_HEIGHT or bird.body.getPosition().y <= 0){
+            resetTubes();
+            bird.body.setPosition(INITIAL_BIRD_POSITION);
+        }
     }
 
     void updateTubes() {
