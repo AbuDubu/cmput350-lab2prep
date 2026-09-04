@@ -74,7 +74,7 @@ struct TubePair {
 bool isTubeOffScreen(const TubePair& tube) { return tube.isOffScreen(); }
 
 struct BirdState {
-    BirdState() : velocityY{INITIAL_BIRD_VELOCITY_Y}, body(BIRD_RADIUS) {
+    BirdState() : body(BIRD_RADIUS), velocityY{INITIAL_BIRD_VELOCITY_Y} {
         // ====== ====== ======
         //  - initialize the bird's shape (see below) to have
         //    appropriate size, color, and initial position.
@@ -123,24 +123,30 @@ private:
         bird.velocityY += GRAVITY;
 
         // ====== ====== ======
-        // TODO: (Q3)
         //  - Update bird position according to the rule that bird's y-position
         //    should have bird's y-velocity added to it every frame (assume dt = 1).
         //    Should be equivalent to: bird.positionY += bird.velocityY;
         //  - Note: bird's x-coordinate will alway be exactly 100.f
         // ====== ====== ======
-        bird.body.setPosition({100.f, bird.body.getPosition().y + bird.velocityY });
+        bird.body.setPosition(
+            {INITIAL_BIRD_POSITION.x, bird.body.getPosition().y + bird.velocityY});
 
         // ====== ====== ======
-        // TODO: (Q3)
         //  - Check if the bird has exceeded the bounds of the screen
         //    (i.e., if it's no longer visible). If not, game should reset by clearing
         //    the tubes and restarting the game (setting the bird back to original initial position)
         // ====== ====== ======
-        if (bird.body.getPosition().y >= WINDOW_HEIGHT or bird.body.getPosition().y <= 0){
-            resetTubes();
-            bird.body.setPosition(INITIAL_BIRD_POSITION);
+        const float birdTop = bird.body.getPosition().y;
+
+        if (birdTop > WINDOW_HEIGHT or birdTop + 2.f * BIRD_RADIUS < 0.f) {
+            resetGame();
         }
+    }
+
+    void resetGame() {
+        resetTubes();
+        bird.body.setPosition(INITIAL_BIRD_POSITION);
+        bird.velocityY = INITIAL_BIRD_VELOCITY_Y;
     }
 
     void updateTubes() {
@@ -171,12 +177,25 @@ private:
         //  implicitly converted to a boolean value) depending on whether a rectangle intersects
         //  with another
         // ====== ====== ======
+        bool collisionDetected{false};
+        auto birdBox{bird.body.getGlobalBounds()};
+
+        for (const auto& tubePair : tubes) {
+            if (birdBox.findIntersection(tubePair.topTube.getGlobalBounds()) or
+                birdBox.findIntersection(tubePair.bottomTube.getGlobalBounds())) {
+                collisionDetected = true;
+                break;
+            }
+        }
 
         // ====== ====== ======
         // TODO: (Q4)
         //  If bird hits tube, game should reset by resetting the tubes and resetting the bird
         //  to its initial state (i.e., restarting the game)
         // ====== ====== ======
+        if (collisionDetected) {
+            resetGame();
+        }
     }
 
 public:
