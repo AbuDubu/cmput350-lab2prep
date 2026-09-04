@@ -6,7 +6,10 @@
 #include <vector>
 
 #include <SFML/Audio.hpp>
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 // Constants
 const uint32_t WINDOW_WIDTH = 800;
@@ -24,9 +27,11 @@ const float GRAVITY = 0.3f;
 const float JUMP_SPEED = -5.0f;  // (set velocity of bird in the Y direction upon jump)
 const float TUBE_SPEED = 3.0f;
 
-// TODO: (Q1)
 //  Initial Bird Attributes
 //  Initialize the global (constant) variables for it here (radius, position, color)
+const float BIRD_RADIUS = 15.0f;
+const sf::Vector2f INITIAL_BIRD_POSITION = {100.f, 400.f};
+const sf::Color INITIAL_BIRD_COLOUR = sf::Color::Yellow;
 
 // ResourceManager just owns all the resources/assets you'd want in your game.
 // In an engine, you'd probably want to make this more flexible than what we have here
@@ -232,6 +237,10 @@ int main() {
         //            std::cout << "value is " << *intPtr << '\n';
         //            std::cout << "raw address is " << intPtr.get() << '\n';
         // ====== ====== ======
+
+        resources.jumpSoundBuffer =
+            std::make_unique<sf::SoundBuffer>(sf::SoundBuffer("assets/jump.wav"));
+        resources.jumpSound = std::make_unique<sf::Sound>(sf::Sound(*resources.jumpSoundBuffer));
 
         bool shouldQuit = false;
         // Main game loop
