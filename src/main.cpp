@@ -10,6 +10,8 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 // Constants
 const uint32_t WINDOW_WIDTH = 800;
@@ -193,6 +195,16 @@ void handleInput(sf::Window& window, GameState& gameState, const ResourceManager
         // TODO: (Q2)
         //  implement jump logic (the key press should be space) and play jump sound fx
         // ====== ====== ======
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            // deal with space bar
+            if (keyPressed->scancode == sf::Keyboard::Scan::Space) {
+                gameState.bird.velocityY = JUMP_SPEED;
+
+                if (resources.jumpSound) {
+                    resources.jumpSound->play();
+                }
+            }
+        }
     }
 }
 
@@ -204,9 +216,7 @@ void render(sf::RenderWindow& window, const GameState& gameState) {
         window.draw(tube.topTube);
         window.draw(tube.bottomTube);
     }
-    // ====== ====== ======
-    // TODO: (Q1) Draw bird
-    // ====== ====== ======
+
     window.draw(gameState.bird.body);
     window.display();
 }
@@ -240,9 +250,14 @@ int main() {
         //            std::cout << "raw address is " << intPtr.get() << '\n';
         // ====== ====== ======
 
-        resources.jumpSoundBuffer =
-            std::make_unique<sf::SoundBuffer>(sf::SoundBuffer("assets/jump.wav"));
-        resources.jumpSound = std::make_unique<sf::Sound>(sf::Sound(*resources.jumpSoundBuffer));
+        resources.jumpSoundBuffer = std::make_unique<sf::SoundBuffer>();
+
+        if (!resources.jumpSoundBuffer->loadFromFile("assets/jump.wav")) {
+            std::cerr << "Warning: Could not load jump.wav\n";
+            resources.jumpSoundBuffer.reset();
+        } else {
+            resources.jumpSound = std::make_unique<sf::Sound>(*resources.jumpSoundBuffer);
+        }
 
         bool shouldQuit = false;
         // Main game loop
